@@ -37,6 +37,12 @@ public class UserService : IUserService
         return await _databaseContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
     }
 
+    public async Task LogoutAsync()
+    {
+        var httpContext = _contextAccessor.HttpContext!;
+        await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    }
+
     public async Task RefreshSignInAsync(User user)
     {
         var httpContext = _contextAccessor.HttpContext!;

@@ -1,10 +1,24 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using ProjectManagementSolution.API.Authentication;
 
 namespace ProjectManagementSolution.API.Features.Users;
 
-public class RefreshSignIn
+[ApiController]
+public class RefreshSignIn : ControllerBase
 {
+    private readonly IMediator _mediator;
+
+    public RefreshSignIn(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+    public async Task<IActionResult> RefreshSignInAsync()
+    {
+        _ = await _mediator.Send(new RefreshSignInRequest());
+        return NoContent();
+    }
 }
 
 public record RefreshSignInRequest() : IRequest<Unit>;

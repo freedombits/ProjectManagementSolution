@@ -27,7 +27,7 @@ public class CreateAccountController : ControllerBase
 }
 
 public record CreateAccountRequest(string Username, string EmailAddress, string Password) : IRequest<CreateAccountResponse>;
-public record CreateAccountResponse(bool Success, List<string> Errors);
+public record CreateAccountResponse(bool Success, IEnumerable<string> Errors);
 
 public class CreateAccountRequestValidator : AbstractValidator<CreateAccountRequest>
 {

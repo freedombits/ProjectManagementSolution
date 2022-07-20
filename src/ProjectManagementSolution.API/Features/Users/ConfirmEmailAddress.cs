@@ -54,7 +54,7 @@ public class ConfirmEmailRequestHandler : IRequestHandler<ConfirmEmailRequest, I
                 new ConfirmEmailResponse(false, new[] { "Token has already been used." }));
         }
 
-        if (verificationToken.Expires < DateTime.UtcNow)
+        if (verificationToken.IsExpired())
         {
             return new StatusCodeResponse<ConfirmEmailResponse>(StatusCodes.Status200OK,
                 new ConfirmEmailResponse(false, new[] { "Token is expired." }));
