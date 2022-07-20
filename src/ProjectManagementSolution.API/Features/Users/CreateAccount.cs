@@ -101,15 +101,8 @@ public class CreateAccountRequestHandler : IRequestHandler<CreateAccountRequest,
         _databaseContext.Users.Add(user);
         await _databaseContext.SaveChangesAsync(cancellationToken);
 
-        try
-        {
-            var accountVerificationEmail = new AccountVerificationEmail(verificationToken.Token);
-            await _mediator.Publish(new EmailNotification(accountVerificationEmail), cancellationToken);
-        }
-        catch (Exception exception)
-        {
-            _logger.LogCritical(exception, "Failed to send account verification email to {UserId}", user.Id);
-        }
+        var accountVerificationEmail = new AccountVerificationEmail(verificationToken.Token);
+        await _mediator.Publish(new EmailNotification(accountVerificationEmail), cancellationToken);
 
         return new CreateAccountResponse(true, errors);
     }
