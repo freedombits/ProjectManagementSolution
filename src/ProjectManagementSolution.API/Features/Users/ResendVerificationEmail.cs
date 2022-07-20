@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProjectManagementSolution.API.Authentication;
 using ProjectManagementSolution.API.DataAccess;
 using ProjectManagementSolution.API.Features.Emails;
 using System.IdentityModel.Tokens.Jwt;
@@ -33,34 +34,24 @@ public record ResendVerificationEmailRequest() : IRequest<Unit>;
 public class ResendVerificationEmailRequestHandler : IRequestHandler<ResendVerificationEmailRequest, Unit>
 {
     private readonly IMediator _mediator;
+    private readonly IUserService _userService;
     private readonly DatabaseContext _databaseContext;
-    private readonly IHttpContextAccessor _contextAccessor;
     private readonly ILogger<ResendVerificationEmailRequestHandler> _logger;
 
     public ResendVerificationEmailRequestHandler(IMediator mediator,
+        IUserService userService,
         DatabaseContext databaseContext,
-        IHttpContextAccessor httpContextAccessor,
         ILogger<ResendVerificationEmailRequestHandler> logger)
     {
         _mediator = mediator;
+        _userService = userService;
         _databaseContext = databaseContext;
-        _contextAccessor = httpContextAccessor;
         _logger = logger;
     }
 
     public async Task<Unit> Handle(ResendVerificationEmailRequest request, CancellationToken cancellationToken)
     {
-        // Let's assume this isn't null.
-        var httpContext = _contextAccessor.HttpContext!;
-        var idClaimValue = httpContext.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-
-        if (string.IsNullOrEmpty(idClaimValue))
-        {
-            return Unit.Value;
-        }
-
-        var currentUserId = Guid.Parse(idClaimValue);
-        var currentUser = await _databaseContext.Users.FirstOrDefaultAsync(x => x.Id == currentUserId, cancellationToken);
+        var currentUser = await _userService.GetCurrentUserAsync();
 
         if (currentUser is null)
         {
